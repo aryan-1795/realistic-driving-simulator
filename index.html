@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Drift & Drive — 3D Driving Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./js/vendor/three/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+
+<!-- Start / instructions overlay -->
+<div id="start-overlay">
+  <div class="start-card">
+    <h1>Drift &amp; Drive</h1>
+    <p class="subtitle">A physics-driven 3D driving simulator, right in your browser.</p>
+    <div class="key-grid">
+      <div class="key-row"><span class="key">&uarr; / W</span><span>Accelerator</span></div>
+      <div class="key-row"><span class="key">&darr; / S</span><span>Brake</span></div>
+      <div class="key-row"><span class="key">&larr; &rarr; / A D</span><span>Steer</span></div>
+      <div class="key-row"><span class="key">1–6</span><span>Shift gear</span></div>
+      <div class="key-row"><span class="key">R</span><span>Reverse</span></div>
+      <div class="key-row"><span class="key">0 / N</span><span>Neutral</span></div>
+      <div class="key-row"><span class="key">Space</span><span>Handbrake</span></div>
+    </div>
+    <button id="start-btn">Start Engine</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="shift-flash" class="shift-flash"></div>
+
+  <div class="cluster">
+    <div class="speed-block">
+      <span id="speed-value" class="speed-value">0</span>
+      <span class="speed-unit">km/h</span>
+    </div>
+
+    <div class="gear-block">
+      <span id="gear-value" class="gear-value">N</span>
+      <span class="gear-label">GEAR</span>
+    </div>
+
+    <div class="rpm-block">
+      <div class="rpm-track">
+        <div id="rpm-fill" class="rpm-fill"></div>
+        <div class="rpm-redzone"></div>
+      </div>
+      <div id="rpm-warning" class="rpm-warning">REDLINE</div>
+    </div>
+  </div>
+
+  <div class="hint-strip">
+    <span><b>&uarr;/W</b> gas</span>
+    <span><b>&darr;/S</b> brake</span>
+    <span><b>&larr;&rarr;</b> steer</span>
+    <span><b>1-6</b> gear</span>
+    <span><b>R</b> reverse</span>
+    <span><b>Space</b> handbrake</span>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+<script>
+  document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('start-overlay').classList.add('start-overlay--hidden');
+  });
+
+  // Safety nets that run even if js/main.js fails to load as a module
+  // (e.g. the page was opened via double-click / file:// instead of a server).
+  function showBootError(message) {
+    let el = document.getElementById('boot-error');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'boot-error';
+      el.style.cssText =
+        'position:fixed;inset:0;z-index:9999;background:#1a0000;color:#ff8a8a;' +
+        'font-family:monospace;font-size:13px;padding:24px;white-space:pre-wrap;overflow:auto;';
+      document.body.appendChild(el);
+    }
+    el.textContent = message;
+  }
+
+  if (location.protocol === 'file:') {
+    showBootError(
+      'This page was opened directly as a file (file://...), so the browser blocks ' +
+      'the JavaScript modules it needs and you get a black screen.\n\n' +
+      'Fix: serve the folder over local HTTP instead, e.g. from a terminal in this folder run:\n' +
+      '  npx serve .\n' +
+      'or\n' +
+      '  python3 -m http.server 8000\n\n' +
+      'then open the http://localhost... URL it prints.'
+    );
+  }
+
+  window.addEventListener('error', (e) => {
+    if (document.getElementById('fatal-error')) return; // main.js already reported it
+    showBootError(
+      'A script failed to load or run:\n\n' +
+      (e.message || 'Unknown error') +
+      (e.filename ? `\n\nFile: ${e.filename}:${e.lineno}:${e.colno}` : '') +
+      '\n\nOpen your browser\'s DevTools console (F12) for the full error.'
+    );
+  });
+</script>
+</body>
+</html>
