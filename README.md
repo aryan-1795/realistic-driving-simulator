@@ -1,7 +1,8 @@
 # Drift & Drive — 3D Driving Simulator
 
 A browser-based 3D driving simulator built with plain JS + [Three.js](https://threejs.org)
-(loaded from a CDN — no build step, no bundler, no npm install required).
+r0.160.0, vendored locally in `js/vendor/three/` — no CDN dependency, no build
+step, no bundler, no npm install required.
 
 ## Run it locally
 Just serve the folder over HTTP (can't open `index.html` directly via `file://`
