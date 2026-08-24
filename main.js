@@ -4,6 +4,32 @@ import { Controls } from './controls.js';
 import { buildGround, scatterProps, buildCarMesh } from './environment.js';
 import { EngineAudio } from './audio.js';
 
+function showFatalError(err) {
+  console.error(err);
+  let banner = document.getElementById('fatal-error');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'fatal-error';
+    banner.style.cssText =
+      'position:fixed;inset:0;z-index:9999;background:#1a0000;color:#ff8a8a;' +
+      'font-family:monospace;font-size:13px;padding:24px;white-space:pre-wrap;' +
+      'overflow:auto;';
+    document.body.appendChild(banner);
+  }
+  banner.textContent =
+    'Something went wrong starting the simulator:\n\n' +
+    (err && err.stack ? err.stack : String(err)) +
+    '\n\nOpen your browser\'s DevTools console for more detail.';
+}
+
+try {
+  init();
+} catch (err) {
+  showFatalError(err);
+}
+
+function init() {
+
 // ---------- Renderer / Scene / Camera ----------
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -104,8 +130,7 @@ function updateCamera(dt) {
 
 // ---------- Main loop ----------
 let last = performance.now();
-function animate() {
-  requestAnimationFrame(animate);
+function step() {
   const now = performance.now();
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
@@ -140,4 +165,16 @@ function animate() {
 
   renderer.render(scene, camera);
 }
+
+function animate() {
+  requestAnimationFrame(animate);
+  try {
+    step();
+  } catch (err) {
+    showFatalError(err);
+    throw err;
+  }
+}
 requestAnimationFrame(animate);
+
+} // end init()
